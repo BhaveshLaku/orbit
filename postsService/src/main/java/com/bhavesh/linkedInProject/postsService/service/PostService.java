@@ -1,5 +1,6 @@
 package com.bhavesh.linkedInProject.postsService.service;
 
+import com.bhavesh.linkedInProject.postsService.auth.AuthContextHolder;
 import com.bhavesh.linkedInProject.postsService.dto.PostCreateRequestDto;
 import com.bhavesh.linkedInProject.postsService.dto.PostDto;
 import com.bhavesh.linkedInProject.postsService.entity.Post;
@@ -32,6 +33,12 @@ public class PostService {
 
     public PostDto getPostById(Long postId) {
         log.info("Getting the post with ID: {}", postId);
+
+        Long userId = AuthContextHolder.getCurrentUserId();
+
+        //TODO: Remove in future
+//        Call the Connection-service from the Posts Service and pass the UserId inside the Headers
+
         Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found with ID: " + postId));
         return modelMapper.map(post, PostDto.class);
     }

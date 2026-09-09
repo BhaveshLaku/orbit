@@ -1,5 +1,6 @@
 package com.bhavesh.linkedInProject.postsService.controller;
 
+import com.bhavesh.linkedInProject.postsService.auth.AuthContextHolder;
 import com.bhavesh.linkedInProject.postsService.dto.PostCreateRequestDto;
 import com.bhavesh.linkedInProject.postsService.dto.PostDto;
 import com.bhavesh.linkedInProject.postsService.service.PostService;
@@ -27,7 +28,8 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDto> getPost(@PathVariable Long postId, @RequestHeader("X-User-Id") Long userId) {
+    public ResponseEntity<PostDto> getPost(@PathVariable Long postId) {
+        Long userId = AuthContextHolder.getCurrentUserId();
         PostDto postDto = postService.getPostById(postId);
         return ResponseEntity.ok(postDto);
     }
