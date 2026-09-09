@@ -2,6 +2,7 @@ spring:
   application:
     name: api-gateway
 
+
   cloud:
     gateway:
       server:
@@ -14,12 +15,13 @@ spring:
               filters:
                 - StripPrefix=2
 
-            - id: post-service
-              uri: lb://POST-SERVICE
+            - id: posts-service
+              uri: lb://POSTS-SERVICE
               predicates:
                 - Path=/api/v1/posts/**
               filters:
                 - StripPrefix=2
+                - name: AuthenticationFilter
 
             - id: connection-service
               uri: lb://CONNECTION-SERVICE
@@ -27,6 +29,7 @@ spring:
                 - Path=/api/v1/connections/**
               filters:
                 - StripPrefix=2
+                - name: AuthenticationFilter
 
 server:
   port: 9024
@@ -35,3 +38,6 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:9023/eureka/
+
+
+jwt.secretKey: asdfuasjf9a8s7fd89ihq34kljruyf98ayshcs kdhfioaf suyfdc jha890sduf
