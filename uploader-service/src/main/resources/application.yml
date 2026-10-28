@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: uploader-service
+
+server:
+  servlet:
+    context-path: /uploads
+  port: 9016
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9013/eureka/
+  instance:
+    prefer-ip-address: true
+
+cloudinary:
+  cloud-name: djg6mmrl
+  api-key: 819764822138825
+  api-secret: eeloUsWjbGZPSh0-TkliEL6i9pE
+
+storage:
+  endpoint: ${RUSTFS_ENDPOINT:http://localhost:9000}
+  bucket: orbit-files
+  region: us-east-1
+  access-key: ${RUSTFS_ACCESS_KEY}
+  secret-key: ${RUSTFS_SECRET_KEY}

@@ -1,8 +1,10 @@
 package com.bhavesh.orbit.postsService.service;
 
 
+import com.bhavesh.orbit.postsService.auth.AuthContextHolder;
 import com.bhavesh.orbit.postsService.entity.Post;
 import com.bhavesh.orbit.postsService.entity.PostLike;
+import com.bhavesh.orbit.postsService.event.PostLiked;
 import com.bhavesh.orbit.postsService.exception.ResourceNotFoundException;
 import com.bhavesh.orbit.postsService.repository.PostLikeRepository;
 import com.bhavesh.orbit.postsService.repository.PostRepository;
@@ -10,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import com.bhavesh.orbit.postsService.exception.BadRequestException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,10 +22,11 @@ public class PostLikeService {
 
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
+    private final KafkaTemplate<Long, PostLiked> postLikedKafkaTemplate;
 
     @Transactional
     public void likePost(Long postId) {
-        Long userId = 1L; //hardcoding for now
+        Long userId = AuthContextHolder.getCurrentUserId();
 
         log.info("User with ID: {} liking the post with ID: {}", userId, postId);
 
@@ -41,14 +45,19 @@ public class PostLikeService {
         postLikeRepository.save(postLike);
         
         //TODO: send notification to owner of the post
+        PostLiked postLiked = PostLiked.builder()
+                .postId(postId)
+                .likedByUserId(userId)
+                .ownerUserId(post.getUserId())
+                .build();
+        postLikedKafkaTemplate.send("post_liked_topic", postLiked);
     }
 
 
     @Transactional
     public void unlikePost(Long postId) {
 
-        Long userId = 1L; //hardcoding for now
-
+        Long userId = AuthContextHolder.getCurrentUserId();
         log.info("User with ID: {} unliking the post with ID: {}", userId, postId);
 
         Post post = postRepository.findById(postId).orElseThrow(

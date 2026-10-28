@@ -1,6 +1,6 @@
 package com.bhavesh.orbit.connectionService.auth;
 
-import com.bhavesh.orbit.postsService.auth.RequestInterceptor;
+import com.bhavesh.orbit.connectionService.auth.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

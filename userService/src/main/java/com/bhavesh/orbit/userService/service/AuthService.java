@@ -4,12 +4,14 @@ import com.bhavesh.orbit.userService.dto.LoginRequestDto;
 import com.bhavesh.orbit.userService.dto.SignupRequestDto;
 import com.bhavesh.orbit.userService.dto.UserDto;
 import com.bhavesh.orbit.userService.entity.User;
+import com.bhavesh.orbit.userService.event.UserCreatedEvent;
 import com.bhavesh.orbit.userService.mapper.UserMapper;
 import com.bhavesh.orbit.userService.exception.BadRequestException;
 import com.bhavesh.orbit.userService.repository.UserRepository;
 import com.bhavesh.orbit.userService.util.BCrypt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +22,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final JwtService jwtService;
+    private final KafkaTemplate<Long, UserCreatedEvent> userCreatedEventKafkaTemplate;
 
 
     public UserDto signUp(SignupRequestDto signupRequestDto) {
@@ -35,6 +38,15 @@ public class AuthService {
         User user = userMapper.toEntity(signupRequestDto);
         user.setPassword(BCrypt.hash(signupRequestDto.getPassword()));
         user = userRepository.save(user);
+
+        UserCreatedEvent userCreatedEvent = UserCreatedEvent
+                .builder()
+                .userId(user.getId())
+                .name(user.getName())
+                .build();
+
+        userCreatedEventKafkaTemplate.send("user_created_topic", userCreatedEvent);
+
         return userMapper.toDto(user);
 
     }

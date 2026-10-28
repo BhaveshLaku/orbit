@@ -1,6 +1,6 @@
 package com.bhavesh.orbit.connectionService.auth;
 
-import com.bhavesh.orbit.postsService.auth.AuthContextHolder;
+import com.bhavesh.orbit.connectionService.auth.AuthContextHolder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.stereotype.Component;
